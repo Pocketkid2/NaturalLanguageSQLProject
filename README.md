@@ -7,6 +7,8 @@ Setup Python environment and OpenAI API key (see [guide](https://platform.openai
 ### Step 2
 Create a new SQLite DB and run `create_tables.sql` and `populate_tables.sql`
 
+OR, alternatively, bring your own SQLite DB by changing the filename in `main.py`
+
 ### Step 3
 `python main.py`
 
