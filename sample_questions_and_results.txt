@@ -1,0 +1,137 @@
+$ python main.py
+
+Type your question: How many movies are in the database?
+
+
+SQL Query:  SELECT COUNT(*) AS total_movies FROM Movies; 
+
+
+
+SQL Result: Table Columns: total_movies
+Number of result table rows: 1
+25
+
+
+Natural Language Response:  There are 25 movies in the database. 
+
+
+Type your question: Are there any movies that have not been favorited?  
+
+
+SQL Query:  SELECT movie_id, title FROM Movies WHERE movie_id NOT IN (SELECT movie_id FROM Favorites); 
+
+
+
+SQL Result: Table Columns: movie_id, title
+Number of result table rows: 0
+
+
+
+Natural Language Response:  No, there are no movies that have not been favorited; every movie has been added to someone's favorites list. 
+
+
+Type your question: Are there any users that have favorited more than two movies?
+
+
+SQL Query:  SELECT Users.user_id, Users.username, COUNT(Favorites.movie_id) AS total_favorites
+FROM Users
+JOIN Favorites ON Users.user_id = Favorites.user_id
+GROUP BY Users.user_id
+HAVING total_favorites > 2;
+
+
+
+SQL Result: Table Columns: user_id, username, total_favorites
+Number of result table rows: 10
+1, TheSilverScreenLover, 4
+2, MovieMaverick, 4
+3, CinephileGuru, 4
+4, FilmFanatic22, 4
+5, FlickFollower, 3
+6, CinemaSavvy, 4
+7, ReelReviewer, 4
+8, ScreenSpectator, 4
+9, PicturePassionate, 4
+10, FilmBuff101, 4
+
+
+Natural Language Response:  Yes, there are several users who have favorited more than two movies. Ten users, in fact, have each favorited between three and four movies. Their usernames include TheSilverScreenLover, MovieMaverick, CinephileGuru, FilmFanatic22, FlickFollower, CinemaSavvy, ReelReviewer, ScreenSpectator, PicturePassionate, and FilmBuff101.
+
+
+Type your question: Are there any users that have favorited less than four films?
+
+
+SQL Query:  SELECT Users.user_id, Users.username, COUNT(Favorites.movie_id) AS favorite_count
+FROM Users
+LEFT JOIN Favorites ON Users.user_id = Favorites.user_id
+GROUP BY Users.user_id
+HAVING favorite_count < 4;
+
+
+
+SQL Result: Table Columns: user_id, username, favorite_count
+Number of result table rows: 1
+5, FlickFollower, 3
+
+
+Natural Language Response:  Yes, there is one user who has favorited less than four films. The user with the username "FlickFollower" has favorited three films. 
+
+
+Type your question: What is the average age of all users?
+
+
+SQL Query:  SELECT AVG(strftime('%Y', 'now') - strftime('%Y', birthdate)) as average_age FROM Users; 
+
+
+
+SQL Result: Table Columns: average_age
+Number of result table rows: 1
+26.8
+
+
+Natural Language Response:  The average age of all users is 26.8 years. 
+
+
+Type your question: What is the average account age of all users?
+
+
+SQL Query:  SELECT AVG(julianday('now') - julianday(account_creation_date)) AS average_account_age_days FROM Users; 
+
+
+
+SQL Result: Table Columns: average_account_age_days
+Number of result table rows: 1
+239.18082702541724
+
+
+Natural Language Response:  The average age of all user accounts is approximately 239.18 days. 
+
+
+Type your question: Which films have been put on watchlists more than on favorites lists?
+
+
+SQL Query:  SELECT M.title
+FROM Movies M
+JOIN (
+    SELECT W.movie_id
+    FROM Watchlist W
+    LEFT JOIN Favorites F ON W.movie_id = F.movie_id
+    GROUP BY W.movie_id
+    HAVING COUNT(DISTINCT W.user_id) > COUNT(DISTINCT F.user_id)
+) AS Popularity ON M.movie_id = Popularity.movie_id;
+
+
+
+SQL Result: Table Columns: title
+Number of result table rows: 6
+The Harry Potter series
+The Lord of the Rings: The Return of the King
+Indiana Jones: Raiders of the Lost Ark
+The Terminator
+Die Hard
+The Wizard of Oz
+
+
+Natural Language Response:  The films that have been added to watchlists more often than to favorites lists include "The Harry Potter series," "The Lord of the Rings: The Return of the King," "Indiana Jones: Raiders of the Lost Ark," "The Terminator," "Die Hard," and "The Wizard 
+of Oz."
+

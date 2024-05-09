@@ -1,6 +1,8 @@
 import sqlite3
 from openai import OpenAI
 
+debug = False
+
 client = OpenAI()
 conn = sqlite3.connect('movies.db')
 
@@ -31,7 +33,8 @@ def main():
             prompt_A = sql_syntax + prompt_A_extra +  "Question: " + prompt
             response = get_response(prompt_A)
             sql_query = response.choices[0].message.content
-            #print("\n\nSQL Query: ", sql_query, "\n")                                          # DEBUG
+            if debug:
+                print("\n\nSQL Query: ", sql_query, "\n")                                          
 
             # Step 4 - Execute SQL query
             c.execute(sql_query)
@@ -42,13 +45,17 @@ def main():
             rows = c.fetchall()                                                                                 # Fetch all the rows
             rows_str = '\n'.join(', '.join(str(item) for item in row) for row in rows)                          # Convert the rows to strings
             result_str = column_names_str + '\n' + f'Number of result table rows: {len(rows)}\n' + rows_str     # Combine the column names and rows into one string
-            #print("\n\nSQL Result: " + result_str)                                              # DEBUG
+            if debug:
+                print("\n\nSQL Result: " + result_str)                                              
 
             # Step 7 - Ask OpenAI to convert the SQL result to natural language
             prompt_B = sql_syntax + "-- The preceding SQLite table schema was used to answer this natural language question with this SQL query\n" + "Question: " + prompt + "\n" + "SQL Query: " + sql_query + "\n" + "Result: " + result_str + "\n\n" + "Convert this response into natural language as clearly and succinctly as possible. Only answer with that natural language translation."
             response = get_response(prompt_B)
             natural_language_response = response.choices[0].message.content
-            print(natural_language_response)
+            if debug:
+                print("\n\nNatural Language Response: ", natural_language_response, "\n")
+            else:
+                print(natural_language_response)
 
             
         conn.close()
